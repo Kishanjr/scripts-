@@ -1,0 +1,25 @@
+function onEdit(e) {
+  var sheet = e.source.getActiveSheet();
+  var editedColumn = e.range.getColumn();
+  var editedRow = e.range.getRow();
+  
+  var dateColumn = 2;  // Column B for creation date
+  var updateColumn = 3; // Column C for updated date
+  
+  var rangeA = 1; // Column A
+  var rangeD_F = [4, 5, 6]; // Columns D, E, F
+  
+  var timestamp = new Date();
+  
+  if (editedColumn === rangeA) {
+    // Set date only if column A is edited and B is empty
+    if (sheet.getRange(editedRow, dateColumn).getValue() === "") {
+      sheet.getRange(editedRow, dateColumn).setValue(timestamp);
+    }
+  }
+  
+  if (rangeD_F.includes(editedColumn)) {
+    // Set update date when columns D-F are edited
+    sheet.getRange(editedRow, updateColumn).setValue(timestamp);
+  }
+}
