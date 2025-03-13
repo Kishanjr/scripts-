@@ -22,4 +22,20 @@ function onEdit(e) {
     // Set update date when columns D-F are edited
     sheet.getRange(editedRow, updateColumn).setValue(timestamp);
   }
+if (editedColumn === 4) { // Column D
+    var status = e.range.getValue();
+    
+    if (status === "Completed") {
+      var targetSheet = e.source.getSheetByName(targetSheetName);
+      if (!targetSheet) {
+        targetSheet = e.source.insertSheet(targetSheetName);
+      }
+      
+      var lastRow = targetSheet.getLastRow() + 1;
+      var rowData = sheet.getRange(editedRow, 1, 1, sheet.getLastColumn()).getValues();
+      
+      targetSheet.getRange(lastRow, 1, 1, rowData[0].length).setValues(rowData);
+      sheet.deleteRow(editedRow);
+    }
+
 }
