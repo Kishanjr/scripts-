@@ -39,3 +39,18 @@ if (editedColumn === 4) { // Column D
     }
 
 }
+function updatePriority(sheet, priorityColumn) {
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return; // No data to update
+
+  var priorityValues = sheet.getRange(2, priorityColumn, lastRow - 1, 1).getValues().flat();
+  
+  priorityValues = priorityValues
+    .filter(value => !isNaN(value) && value !== "") // Filter out empty/non-numeric values
+    .sort((a, b) => a - b); // Sort priority numbers
+  
+  for (var i = 0; i < priorityValues.length; i++) {
+    sheet.getRange(i + 2, priorityColumn).setValue(i + 1); // Assign new priority order
+  }
+}
+
