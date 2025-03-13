@@ -39,18 +39,18 @@ if (editedColumn === 4) { // Column D
     }
 
 }
-function updatePriority(sheet, priorityColumn) {
+function shiftPriorities(sheet, priorityColumn, removedPriority) {
   var lastRow = sheet.getLastRow();
   if (lastRow < 2) return; // No data to update
 
-  var priorityValues = sheet.getRange(2, priorityColumn, lastRow - 1, 1).getValues().flat();
-  
-  priorityValues = priorityValues
-    .filter(value => !isNaN(value) && value !== "") // Filter out empty/non-numeric values
-    .sort((a, b) => a - b); // Sort priority numbers
-  
+  var priorityRange = sheet.getRange(2, priorityColumn, lastRow - 1, 1);
+  var priorityValues = priorityRange.getValues();
+
   for (var i = 0; i < priorityValues.length; i++) {
-    sheet.getRange(i + 2, priorityColumn).setValue(i + 1); // Assign new priority order
+    var currentPriority = priorityValues[i][0];
+    
+    if (currentPriority > removedPriority) {
+      sheet.getRange(i + 2, priorityColumn).setValue(currentPriority - 1);
+    }
   }
 }
-
