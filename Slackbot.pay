@@ -1,0 +1,41 @@
+from slack_bolt import App
+from slack_bolt.adapter.socket_mode import SocketModeHandler
+
+app = App(token="xoxb-your-slack-bot-token")
+
+@app.command("/orderstatus")
+def open_order_modal(ack, body, client):
+    ack()
+    client.views_open(
+        trigger_id=body["trigger_id"],
+        view={
+            "type": "modal",
+            "callback_id": "order_input_modal",
+            "title": {"type": "plain_text", "text": "Run Swagger"},
+            "submit": {"type": "plain_text", "text": "Submit"},
+            "blocks": [
+                {
+                    "type": "input",
+                    "block_id": "order_input",
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "order_number_input"
+                    },
+                    "label": {"type": "plain_text", "text": "Enter Order Number"}
+                }
+            ]
+        }
+    )
+
+@app.view("order_input_modal")
+def handle_submission(ack, body, view, say):
+    ack()
+    order_number = view["state"]["values"]["order_input"]["order_number_input"]["value"]
+    # Process order number, run Swagger, etc.
+    result_message = f"Processing Order {order_number}..."
+    # Run your logic here, then respond
+    say(result_message)
+
+if __name__ == "__main__":
+    handler = SocketModeHandler(app, "xapp-your-socket-token")
+    handler.start()
