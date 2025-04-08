@@ -1,44 +1,49 @@
-// src/app/components/software-service/connect/connect.component.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { OrderService } from '../../../services/order.service';
+import { ApiService } from '../../../services/api.service';
 
 @Component({
   selector: 'app-connect',
-  templateUrl: './connect.component.html'
+  templateUrl: './connect.component.html',
+  styleUrls: ['./connect.component.css']
 })
 export class ConnectComponent implements OnInit {
   form!: FormGroup;
   data: any[] = [];
+  columns: string[] = [];
   error: string | null = null;
 
   constructor(
     private fb: FormBuilder,
-    private orderSvc: OrderService
+    private api: ApiService
   ) {}
 
   ngOnInit() {
+    // build the reactive form
     this.form = this.fb.group({
       orderNumber: ['', Validators.required]
     });
   }
 
   onSearch() {
+    // reset state
     this.error = null;
     this.data = [];
 
     if (this.form.invalid) {
-      this.error = 'Order number is required';
+      this.error = 'Please enter an order number';
       return;
     }
 
-    const num = this.form.value.orderNumber;
-    this.orderSvc.searchByPost(num).subscribe({
-      next: results => {
-        this.data = results;
+    const orderNumber = this.form.value.orderNumber;
+    this.api.searchOrders(orderNumber).subscribe({
+      next: (res: any[]) => {
+        this.data = res;
+        // grab columns from the first object
+        this.columns = res.length ? Object.keys(res[0]) : [];
       },
       error: err => {
-        this.error = err.message || 'Failed to fetch order';
+        this.error = err.message || 'Error fetching orders';
       }
     });
   }
