@@ -1,0 +1,19 @@
+<form [formGroup]="form" (ngSubmit)="onSearch()">
+  <input formControlName="orderNumber" placeholder="Order #">
+  <button type="submit" [disabled]="form.invalid">Execute</button>
+</form>
+
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<table *ngIf="data.length">
+  <thead>
+    <tr>
+      <th *ngFor="let key of (data[0] | keyvalue)">{{ key.key }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let row of data">
+      <td *ngFor="let cell of (row | keyvalue)">{{ cell.value }}</td>
+    </tr>
+  </tbody>
+</table>
