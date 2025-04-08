@@ -1,24 +1,45 @@
-// src/app/services/order.service.ts
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { AuthService } from '../auth.service';
+// src/app/components/software-service/connect/connect.component.ts
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { OrderService } from '../../../services/order.service';
 
-@Injectable({ providedIn: 'root' })
-export class OrderService {
-  private apiUrl = 'http://your-api-host/api/orders';
+@Component({
+  selector: 'app-connect',
+  templateUrl: './connect.component.html'
+})
+export class ConnectComponent implements OnInit {
+  form!: FormGroup;
+  data: any[] = [];
+  error: string | null = null;
 
   constructor(
-    private http: HttpClient,
-    private auth: AuthService
+    private fb: FormBuilder,
+    private orderSvc: OrderService
   ) {}
 
-  searchOrder(orderNumber: string): Observable<any[]> {
-    const token = this.auth.getToken();  // however you expose it
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get<any[]>(
-      `${this.apiUrl}?orderNumber=${encodeURIComponent(orderNumber)}`,
-      { headers }
-    );
+  ngOnInit() {
+    this.form = this.fb.group({
+      orderNumber: ['', Validators.required]
+    });
+  }
+
+  onSearch() {
+    this.error = null;
+    this.data = [];
+
+    if (this.form.invalid) {
+      this.error = 'Order number is required';
+      return;
+    }
+
+    const num = this.form.value.orderNumber;
+    this.orderSvc.searchByPost(num).subscribe({
+      next: results => {
+        this.data = results;
+      },
+      error: err => {
+        this.error = err.message || 'Failed to fetch order';
+      }
+    });
   }
 }
